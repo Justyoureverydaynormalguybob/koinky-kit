@@ -60,13 +60,16 @@ export async function rebuildFromChain(opts: { network?: Network; contractId: st
     for (const it of items) {
       const tr = it.trx ?? {};
       for (const ev of tr.receipt?.events ?? []) {
-        if (ev.source !== opts.contractId || !ev.name.startsWith("koinky.")) continue;
+        // Accept the current namespace and the pre-rename one, so older testnet history still rebuilds.
+        const m = /^(koinky|stampa)\.(\w+)$/.exec(ev.name);
+        if (ev.source !== opts.contractId || !m) continue;
         const data = typeof ev.data === "object" && ev.data ? (ev.data as Record<string, unknown>) : { raw: ev.data };
-        events.push({ ...data, seq: it.seq_num ?? null, txId: tr.transaction?.id ?? null, height: null, time: null, event: ev.name.replace("koinky.", "") });
+        events.push({ ...data, seq: it.seq_num ?? null, txId: tr.transaction?.id ?? null, height: null, time: null, event: m[2] });
       }
     }
+    // The node may cap the page size below `limit`, so only stop when the cursor stops moving.
     const last = items[items.length - 1].seq_num;
-    if (items.length < 100 || last == null || Number(last) === seq) break;
+    if (last == null || Number(last) + 1 === seq) break;
     seq = Number(last) + 1;
   }
   const kept = events.filter((e) => !opts.programId || String(e.program_id ?? e.id) === String(opts.programId));

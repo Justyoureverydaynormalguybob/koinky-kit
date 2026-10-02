@@ -47,6 +47,7 @@ test("events decode with the bundled ABI", async () => {
 test("network config and mana units", () => {
   assert.equal(networkConfig("testnet").rpc, "https://testnet.koinosfoundation.org/jsonrpc");
   assert.equal(networkConfig("mainnet", { rpc: "http://localhost:8080" }).rpc, "http://localhost:8080");
+  assert.equal(networkConfig("testnet", { rpc: undefined, rest: "" }).rpc, "https://testnet.koinosfoundation.org/jsonrpc");
   assert.equal(MANA, 100_000_000n);
 });
 

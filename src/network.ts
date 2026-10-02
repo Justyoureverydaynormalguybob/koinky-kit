@@ -26,7 +26,8 @@ export const NETWORKS: Record<Network, NetworkConfig> = {
 };
 
 export function networkConfig(network: Network = "testnet", overrides: Partial<NetworkConfig> = {}): NetworkConfig {
-  return { ...NETWORKS[network], ...overrides, network };
+  const clean = Object.fromEntries(Object.entries(overrides).filter(([, v]) => v !== undefined && v !== null && v !== ""));
+  return { ...NETWORKS[network], ...clean, network };
 }
 
 /** 1 KOIN = 1 mana = 100,000,000 "satoshis" of rc. */

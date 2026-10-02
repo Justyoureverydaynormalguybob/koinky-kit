@@ -1,0 +1,210 @@
+syntax = "proto3";
+
+package koinky;
+
+import "koinos/options.proto";
+
+// ---------------------------------------------------------------------------
+// Koinky: soulbound loyalty and attendance stamps.
+//
+// Stamps are issued by a single platform "issuer" key on behalf of businesses
+// and events ("programs"). They cannot be transferred, so they are worthless
+// to steal and need no customer signature to receive.
+// ---------------------------------------------------------------------------
+
+// ----- storage objects -----
+
+message config_object {
+  bytes owner = 1 [(koinos.btype) = ADDRESS];
+  bytes issuer = 2 [(koinos.btype) = ADDRESS];
+  uint64 programs = 3 [jstype = JS_STRING];
+  uint64 stamps = 4 [jstype = JS_STRING];
+  uint64 redeemed = 5 [jstype = JS_STRING];
+}
+
+message program_object {
+  uint64 id = 1 [jstype = JS_STRING];
+  bytes owner = 2 [(koinos.btype) = ADDRESS];
+  string name = 3;
+  // 1 = loyalty card (many stamps per holder), 2 = attendance (one per holder)
+  uint32 kind = 4;
+  string uri = 5;
+  // unix milliseconds; 0 means no bound
+  uint64 starts = 6 [jstype = JS_STRING];
+  uint64 ends = 7 [jstype = JS_STRING];
+  // maximum stamps issued across all holders; 0 means unlimited
+  uint64 cap = 8 [jstype = JS_STRING];
+  // stamps needed per reward; 0 means no reward rule
+  uint32 threshold = 9;
+  uint64 minted = 10 [jstype = JS_STRING];
+  uint64 redeemed = 11 [jstype = JS_STRING];
+  bool active = 12;
+  uint64 created = 13 [jstype = JS_STRING];
+}
+
+message holder_object {
+  uint64 stamps = 1 [jstype = JS_STRING];
+  uint64 spent = 2 [jstype = JS_STRING];
+  uint64 last = 3 [jstype = JS_STRING];
+  uint64 rewards = 4 [jstype = JS_STRING];
+}
+
+// ----- read methods -----
+
+// @description Contract name
+// @read-only true
+message name_arguments {}
+message name_result { string value = 1; }
+
+// @description Contract symbol
+// @read-only true
+message symbol_arguments {}
+message symbol_result { string value = 1; }
+
+// @description Base URI for metadata
+// @read-only true
+message uri_arguments {}
+message uri_result { string value = 1; }
+
+// @description Owner, issuer and global counters
+// @read-only true
+message get_config_arguments {}
+message get_config_result { config_object value = 1; }
+
+// @description One program by id
+// @read-only true
+message get_program_arguments { uint64 id = 1 [jstype = JS_STRING]; }
+message get_program_result { program_object value = 1; }
+
+// @description Programs with id greater than start, up to limit
+// @read-only true
+message get_programs_arguments {
+  uint64 start = 1 [jstype = JS_STRING];
+  uint32 limit = 2;
+}
+message get_programs_result { repeated program_object values = 1; }
+
+// @description Stamp balance of a holder in a program
+// @read-only true
+message balance_of_arguments {
+  bytes holder = 1 [(koinos.btype) = ADDRESS];
+  uint64 program_id = 2 [jstype = JS_STRING];
+}
+message balance_of_result {
+  uint64 stamps = 1 [jstype = JS_STRING];
+  uint64 spent = 2 [jstype = JS_STRING];
+  uint64 unspent = 3 [jstype = JS_STRING];
+  uint64 rewards = 4 [jstype = JS_STRING];
+  uint64 last = 5 [jstype = JS_STRING];
+}
+
+// ----- write methods -----
+
+// @description Set the owner (cold key). Owner only.
+// @read-only false
+message set_owner_arguments { bytes owner = 1 [(koinos.btype) = ADDRESS]; }
+message set_owner_result {}
+
+// @description Set the issuer (hot key allowed to stamp). Owner only.
+// @read-only false
+message set_issuer_arguments { bytes issuer = 1 [(koinos.btype) = ADDRESS]; }
+message set_issuer_result {}
+
+// @description Create a loyalty card or attendance event. Issuer only.
+// @read-only false
+message create_program_arguments {
+  bytes owner = 1 [(koinos.btype) = ADDRESS];
+  string name = 2;
+  uint32 kind = 3;
+  string uri = 4;
+  uint64 starts = 5 [jstype = JS_STRING];
+  uint64 ends = 6 [jstype = JS_STRING];
+  uint64 cap = 7 [jstype = JS_STRING];
+  uint32 threshold = 8;
+}
+message create_program_result { uint64 id = 1 [jstype = JS_STRING]; }
+
+// @description Update a program's mutable fields. Issuer only.
+// @read-only false
+message update_program_arguments {
+  uint64 id = 1 [jstype = JS_STRING];
+  string name = 2;
+  string uri = 3;
+  uint64 ends = 4 [jstype = JS_STRING];
+  uint64 cap = 5 [jstype = JS_STRING];
+  uint32 threshold = 6;
+  bool active = 7;
+}
+message update_program_result {}
+
+// @description Issue count stamps to holder. Issuer only.
+// @read-only false
+message stamp_arguments {
+  uint64 program_id = 1 [jstype = JS_STRING];
+  bytes holder = 2 [(koinos.btype) = ADDRESS];
+  uint32 count = 3;
+  string memo = 4;
+}
+message stamp_result {
+  uint64 stamps = 1 [jstype = JS_STRING];
+  uint64 unspent = 2 [jstype = JS_STRING];
+}
+
+// @description Redeem count rewards, spending threshold stamps each. Issuer only.
+// @read-only false
+message redeem_arguments {
+  uint64 program_id = 1 [jstype = JS_STRING];
+  bytes holder = 2 [(koinos.btype) = ADDRESS];
+  uint32 count = 3;
+  string memo = 4;
+}
+message redeem_result {
+  uint64 unspent = 1 [jstype = JS_STRING];
+  uint64 rewards = 2 [jstype = JS_STRING];
+}
+
+// @description Remove count unspent stamps from holder. Issuer only.
+// @read-only false
+message revoke_arguments {
+  uint64 program_id = 1 [jstype = JS_STRING];
+  bytes holder = 2 [(koinos.btype) = ADDRESS];
+  uint32 count = 3;
+}
+message revoke_result { uint64 unspent = 1 [jstype = JS_STRING]; }
+
+// ----- events -----
+
+message owner_event { bytes owner = 1 [(koinos.btype) = ADDRESS]; }
+message issuer_event { bytes issuer = 1 [(koinos.btype) = ADDRESS]; }
+
+message program_event {
+  uint64 id = 1 [jstype = JS_STRING];
+  bytes owner = 2 [(koinos.btype) = ADDRESS];
+  string name = 3;
+  uint32 kind = 4;
+  bool active = 5;
+}
+
+message stamp_event {
+  uint64 program_id = 1 [jstype = JS_STRING];
+  bytes holder = 2 [(koinos.btype) = ADDRESS];
+  uint32 count = 3;
+  uint64 stamps = 4 [jstype = JS_STRING];
+  uint64 unspent = 5 [jstype = JS_STRING];
+  string memo = 6;
+}
+
+message redeem_event {
+  uint64 program_id = 1 [jstype = JS_STRING];
+  bytes holder = 2 [(koinos.btype) = ADDRESS];
+  uint32 count = 3;
+  uint64 unspent = 4 [jstype = JS_STRING];
+  string memo = 5;
+}
+
+message revoke_event {
+  uint64 program_id = 1 [jstype = JS_STRING];
+  bytes holder = 2 [(koinos.btype) = ADDRESS];
+  uint32 count = 3;
+  uint64 unspent = 4 [jstype = JS_STRING];
+}

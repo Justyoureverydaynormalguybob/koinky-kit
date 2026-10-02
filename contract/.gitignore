@@ -1,0 +1,6 @@
+node_modules
+build
+.stubs
+assembly/proto/*.ts
+assembly/index.ts
+assembly/*.boilerplate.ts

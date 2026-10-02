@@ -1,0 +1,110 @@
+import { Contract, Provider } from "koilib";
+import { kitAbi } from "./abi.js";
+import { networkConfig, type Network } from "./network.js";
+import type { Balance, Program } from "./issuer.js";
+
+export interface RebuiltEvent {
+  seq: string | number | null;
+  txId: string | null;
+  height: string | null;
+  time: string | null;
+  event: string;
+  program_id?: string;
+  id?: string;
+  holder?: string;
+  count?: number;
+  stamps?: string;
+  unspent?: string;
+  memo?: string;
+  [k: string]: unknown;
+}
+
+export interface Rebuilt {
+  network: Network;
+  contract: string;
+  rebuiltAt: string;
+  programs: Program[];
+  holders: Record<string, (Balance & { holder: string; lastStampAt: string | null })[]>;
+  events: RebuiltEvent[];
+}
+
+/**
+ * Reconstruct programs, every holder's balance and the full dated event log
+ * from the chain alone. No database involved. Names and emails never went on
+ * chain, so holders come back as addresses.
+ */
+export async function rebuildFromChain(opts: { network?: Network; contractId: string; programId?: string | number; rpc?: string; rest?: string; log?: (s: string) => void }): Promise<Rebuilt> {
+  const net = networkConfig(opts.network ?? "testnet", { rpc: opts.rpc, rest: opts.rest });
+  const provider = new Provider([net.rpc]);
+  const c = new Contract({ id: opts.contractId, abi: kitAbi(), provider });
+  const log = opts.log ?? (() => {});
+
+  const programs: Program[] = [];
+  let start = "0";
+  for (;;) {
+    const page = ((await c.functions.get_programs({ start, limit: 100 })).result as { values?: Program[] } | undefined)?.values ?? [];
+    programs.push(...page);
+    if (page.length < 100) break;
+    start = page[page.length - 1].id;
+  }
+  const wanted = programs.filter((p) => !opts.programId || String(p.id) === String(opts.programId));
+  log(`${programs.length} programs on contract`);
+
+  const events: RebuiltEvent[] = [];
+  let seq: number | null = null;
+  for (let page = 0; page < 10_000; page++) {
+    const url = `${net.rest}/v1/account/${opts.contractId}/history?limit=100&ascending=true${seq != null ? `&seq_num=${seq}` : ""}`;
+    const r = (await fetch(url).then((x) => x.json())) as unknown;
+    const items = (Array.isArray(r) ? r : (r as { values?: unknown[] }).values ?? []) as { seq_num?: string | number; trx?: { transaction?: { id?: string }; receipt?: { events?: { source: string; name: string; data: unknown }[] } } }[];
+    if (!items.length) break;
+    for (const it of items) {
+      const tr = it.trx ?? {};
+      for (const ev of tr.receipt?.events ?? []) {
+        if (ev.source !== opts.contractId || !ev.name.startsWith("koinky.")) continue;
+        const data = typeof ev.data === "object" && ev.data ? (ev.data as Record<string, unknown>) : { raw: ev.data };
+        events.push({ ...data, seq: it.seq_num ?? null, txId: tr.transaction?.id ?? null, height: null, time: null, event: ev.name.replace("koinky.", "") });
+      }
+    }
+    const last = items[items.length - 1].seq_num;
+    if (items.length < 100 || last == null || Number(last) === seq) break;
+    seq = Number(last) + 1;
+  }
+  const kept = events.filter((e) => !opts.programId || String(e.program_id ?? e.id) === String(opts.programId));
+  log(`${events.length} events (${kept.length} kept)`);
+
+  const blockOf = new Map<string, { height: string | null; time: string | null }>();
+  for (const txId of [...new Set(kept.map((e) => e.txId).filter((x): x is string => Boolean(x)))]) {
+    try {
+      const st = (await provider.getTransactionsById([txId])) as { transactions?: { containing_blocks?: string[] }[] };
+      const id = st.transactions?.[0]?.containing_blocks?.[0];
+      const b = id ? ((await fetch(`${net.rest}/v1/block/${id}`).then((x) => (x.ok ? x.json() : null))) as { block_height?: string; block?: { header?: { timestamp?: string } } } | null) : null;
+      blockOf.set(txId, { height: b?.block_height ?? null, time: b?.block?.header?.timestamp ? new Date(Number(b.block.header.timestamp)).toISOString() : null });
+    } catch {
+      blockOf.set(txId, { height: null, time: null });
+    }
+  }
+  for (const e of kept) {
+    const b = e.txId ? blockOf.get(e.txId) : undefined;
+    e.height = b?.height ?? null;
+    e.time = b?.time ?? null;
+  }
+
+  const holders: Rebuilt["holders"] = {};
+  for (const p of wanted) {
+    const addrs = [...new Set(kept.filter((e) => String(e.program_id) === String(p.id) && e.holder).map((e) => e.holder as string))];
+    holders[p.id] = [];
+    for (const holder of addrs) {
+      const b = ((await c.functions.balance_of({ holder, program_id: p.id })).result as Partial<Balance> | undefined) ?? {};
+      const bal: Balance = { stamps: b.stamps ?? "0", spent: b.spent ?? "0", unspent: b.unspent ?? "0", rewards: b.rewards ?? "0", last: b.last ?? "0" };
+      holders[p.id].push({ holder, ...bal, lastStampAt: bal.last !== "0" ? new Date(Number(bal.last)).toISOString() : null });
+    }
+  }
+
+  return { network: net.network, contract: opts.contractId, rebuiltAt: new Date().toISOString(), programs: wanted, holders, events: kept };
+}
+
+export function rebuiltToCsv(r: Rebuilt): string {
+  const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const rows = r.events.map((e) => [e.time, e.height, e.txId, e.event, e.program_id ?? e.id, e.holder ?? "", e.count ?? "", e.stamps ?? "", e.unspent ?? "", e.memo ?? ""].map(esc).join(","));
+  return ["time,block,tx,event,program_id,holder,count,stamps_after,unspent_after,memo", ...rows].join("\n");
+}

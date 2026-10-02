@@ -1,0 +1,15 @@
+{
+  "name": "koinky-contract",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Koinky: soulbound loyalty and attendance stamps on Koinos",
+  "scripts": {
+    "build": "sh scripts/build.sh release 0",
+    "build:debug": "sh scripts/build.sh debug 0",
+    "test": "sh scripts/test.sh"
+  },
+  "devDependencies": {
+    "@koinos/sdk-as": "1.5.1"
+  },
+  "type": "module"
+}

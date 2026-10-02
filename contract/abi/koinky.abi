@@ -1,0 +1,103 @@
+{
+    "methods": {
+        "name": {
+            "argument": "koinky.name_arguments",
+            "return": "koinky.name_result",
+            "description": "Contract name",
+            "entry-point": "0x82a3537f",
+            "read-only": true
+        },
+        "symbol": {
+            "argument": "koinky.symbol_arguments",
+            "return": "koinky.symbol_result",
+            "description": "Contract symbol",
+            "entry-point": "0xb76a7ca1",
+            "read-only": true
+        },
+        "uri": {
+            "argument": "koinky.uri_arguments",
+            "return": "koinky.uri_result",
+            "description": "Base URI for metadata",
+            "entry-point": "0x70e5d7b6",
+            "read-only": true
+        },
+        "get_config": {
+            "argument": "koinky.get_config_arguments",
+            "return": "koinky.get_config_result",
+            "description": "Owner, issuer and global counters",
+            "entry-point": "0xbc4fcdd4",
+            "read-only": true
+        },
+        "get_program": {
+            "argument": "koinky.get_program_arguments",
+            "return": "koinky.get_program_result",
+            "description": "One program by id",
+            "entry-point": "0x2ca77ab4",
+            "read-only": true
+        },
+        "get_programs": {
+            "argument": "koinky.get_programs_arguments",
+            "return": "koinky.get_programs_result",
+            "description": "Programs with id greater than start, up to limit",
+            "entry-point": "0x38c59646",
+            "read-only": true
+        },
+        "balance_of": {
+            "argument": "koinky.balance_of_arguments",
+            "return": "koinky.balance_of_result",
+            "description": "Stamp balance of a holder in a program",
+            "entry-point": "0x5c721497",
+            "read-only": true
+        },
+        "set_owner": {
+            "argument": "koinky.set_owner_arguments",
+            "return": "koinky.set_owner_result",
+            "description": "Set the owner (cold key). Owner only.",
+            "entry-point": "0x0e3c7f5b",
+            "read-only": false
+        },
+        "set_issuer": {
+            "argument": "koinky.set_issuer_arguments",
+            "return": "koinky.set_issuer_result",
+            "description": "Set the issuer (hot key allowed to stamp). Owner only.",
+            "entry-point": "0x1ee17e62",
+            "read-only": false
+        },
+        "create_program": {
+            "argument": "koinky.create_program_arguments",
+            "return": "koinky.create_program_result",
+            "description": "Create a loyalty card or attendance event. Issuer only.",
+            "entry-point": "0x4273b040",
+            "read-only": false
+        },
+        "update_program": {
+            "argument": "koinky.update_program_arguments",
+            "return": "koinky.update_program_result",
+            "description": "Update a program's mutable fields. Issuer only.",
+            "entry-point": "0x82fa2db6",
+            "read-only": false
+        },
+        "stamp": {
+            "argument": "koinky.stamp_arguments",
+            "return": "koinky.stamp_result",
+            "description": "Issue count stamps to holder. Issuer only.",
+            "entry-point": "0xe0afcdbf",
+            "read-only": false
+        },
+        "redeem": {
+            "argument": "koinky.redeem_arguments",
+            "return": "koinky.redeem_result",
+            "description": "Redeem count rewards, spending threshold stamps each. Issuer only.",
+            "entry-point": "0x2e5106cc",
+            "read-only": false
+        },
+        "revoke": {
+            "argument": "koinky.revoke_arguments",
+            "return": "koinky.revoke_result",
+            "description": "Remove count unspent stamps from holder. Issuer only.",
+            "entry-point": "0x777ac4ea",
+            "read-only": false
+        }
+    },
+    "types": "CoYaChthc3NlbWJseS9wcm90by9rb2lua3kucHJvdG8SBmtvaW5reRoUa29pbm9zL29wdGlvbnMucHJvdG8ipQEKDWNvbmZpZ19vYmplY3QSGgoFb3duZXIYASABKAxCBIC1GAZSBW93bmVyEhwKBmlzc3VlchgCIAEoDEIEgLUYBlIGaXNzdWVyEh4KCHByb2dyYW1zGAMgASgEQgIwAVIIcHJvZ3JhbXMSGgoGc3RhbXBzGAQgASgEQgIwAVIGc3RhbXBzEh4KCHJlZGVlbWVkGAUgASgEQgIwAVIIcmVkZWVtZWQi1AIKDnByb2dyYW1fb2JqZWN0EhIKAmlkGAEgASgEQgIwAVICaWQSGgoFb3duZXIYAiABKAxCBIC1GAZSBW93bmVyEhIKBG5hbWUYAyABKAlSBG5hbWUSEgoEa2luZBgEIAEoDVIEa2luZBIQCgN1cmkYBSABKAlSA3VyaRIaCgZzdGFydHMYBiABKARCAjABUgZzdGFydHMSFgoEZW5kcxgHIAEoBEICMAFSBGVuZHMSFAoDY2FwGAggASgEQgIwAVIDY2FwEhwKCXRocmVzaG9sZBgJIAEoDVIJdGhyZXNob2xkEhoKBm1pbnRlZBgKIAEoBEICMAFSBm1pbnRlZBIeCghyZWRlZW1lZBgLIAEoBEICMAFSCHJlZGVlbWVkEhYKBmFjdGl2ZRgMIAEoCFIGYWN0aXZlEhwKB2NyZWF0ZWQYDSABKARCAjABUgdjcmVhdGVkInsKDWhvbGRlcl9vYmplY3QSGgoGc3RhbXBzGAEgASgEQgIwAVIGc3RhbXBzEhgKBXNwZW50GAIgASgEQgIwAVIFc3BlbnQSFgoEbGFzdBgDIAEoBEICMAFSBGxhc3QSHAoHcmV3YXJkcxgEIAEoBEICMAFSB3Jld2FyZHMiEAoObmFtZV9hcmd1bWVudHMiIwoLbmFtZV9yZXN1bHQSFAoFdmFsdWUYASABKAlSBXZhbHVlIhIKEHN5bWJvbF9hcmd1bWVudHMiJQoNc3ltYm9sX3Jlc3VsdBIUCgV2YWx1ZRgBIAEoCVIFdmFsdWUiDwoNdXJpX2FyZ3VtZW50cyIiCgp1cmlfcmVzdWx0EhQKBXZhbHVlGAEgASgJUgV2YWx1ZSIWChRnZXRfY29uZmlnX2FyZ3VtZW50cyJAChFnZXRfY29uZmlnX3Jlc3VsdBIrCgV2YWx1ZRgBIAEoCzIVLmtvaW5reS5jb25maWdfb2JqZWN0UgV2YWx1ZSIrChVnZXRfcHJvZ3JhbV9hcmd1bWVudHMSEgoCaWQYASABKARCAjABUgJpZCJCChJnZXRfcHJvZ3JhbV9yZXN1bHQSLAoFdmFsdWUYASABKAsyFi5rb2lua3kucHJvZ3JhbV9vYmplY3RSBXZhbHVlIkgKFmdldF9wcm9ncmFtc19hcmd1bWVudHMSGAoFc3RhcnQYASABKARCAjABUgVzdGFydBIUCgVsaW1pdBgCIAEoDVIFbGltaXQiRQoTZ2V0X3Byb2dyYW1zX3Jlc3VsdBIuCgZ2YWx1ZXMYASADKAsyFi5rb2lua3kucHJvZ3JhbV9vYmplY3RSBnZhbHVlcyJXChRiYWxhbmNlX29mX2FyZ3VtZW50cxIcCgZob2xkZXIYASABKAxCBIC1GAZSBmhvbGRlchIhCgpwcm9ncmFtX2lkGAIgASgEQgIwAVIJcHJvZ3JhbUlkIp0BChFiYWxhbmNlX29mX3Jlc3VsdBIaCgZzdGFtcHMYASABKARCAjABUgZzdGFtcHMSGAoFc3BlbnQYAiABKARCAjABUgVzcGVudBIcCgd1bnNwZW50GAMgASgEQgIwAVIHdW5zcGVudBIcCgdyZXdhcmRzGAQgASgEQgIwAVIHcmV3YXJkcxIWCgRsYXN0GAUgASgEQgIwAVIEbGFzdCIxChNzZXRfb3duZXJfYXJndW1lbnRzEhoKBW93bmVyGAEgASgMQgSAtRgGUgVvd25lciISChBzZXRfb3duZXJfcmVzdWx0IjQKFHNldF9pc3N1ZXJfYXJndW1lbnRzEhwKBmlzc3VlchgBIAEoDEIEgLUYBlIGaXNzdWVyIhMKEXNldF9pc3N1ZXJfcmVzdWx0ItgBChhjcmVhdGVfcHJvZ3JhbV9hcmd1bWVudHMSGgoFb3duZXIYASABKAxCBIC1GAZSBW93bmVyEhIKBG5hbWUYAiABKAlSBG5hbWUSEgoEa2luZBgDIAEoDVIEa2luZBIQCgN1cmkYBCABKAlSA3VyaRIaCgZzdGFydHMYBSABKARCAjABUgZzdGFydHMSFgoEZW5kcxgGIAEoBEICMAFSBGVuZHMSFAoDY2FwGAcgASgEQgIwAVIDY2FwEhwKCXRocmVzaG9sZBgIIAEoDVIJdGhyZXNob2xkIisKFWNyZWF0ZV9wcm9ncmFtX3Jlc3VsdBISCgJpZBgBIAEoBEICMAFSAmlkIrgBChh1cGRhdGVfcHJvZ3JhbV9hcmd1bWVudHMSEgoCaWQYASABKARCAjABUgJpZBISCgRuYW1lGAIgASgJUgRuYW1lEhAKA3VyaRgDIAEoCVIDdXJpEhYKBGVuZHMYBCABKARCAjABUgRlbmRzEhQKA2NhcBgFIAEoBEICMAFSA2NhcBIcCgl0aHJlc2hvbGQYBiABKA1SCXRocmVzaG9sZBIWCgZhY3RpdmUYByABKAhSBmFjdGl2ZSIXChV1cGRhdGVfcHJvZ3JhbV9yZXN1bHQifAoPc3RhbXBfYXJndW1lbnRzEiEKCnByb2dyYW1faWQYASABKARCAjABUglwcm9ncmFtSWQSHAoGaG9sZGVyGAIgASgMQgSAtRgGUgZob2xkZXISFAoFY291bnQYAyABKA1SBWNvdW50EhIKBG1lbW8YBCABKAlSBG1lbW8iSAoMc3RhbXBfcmVzdWx0EhoKBnN0YW1wcxgBIAEoBEICMAFSBnN0YW1wcxIcCgd1bnNwZW50GAIgASgEQgIwAVIHdW5zcGVudCJ9ChByZWRlZW1fYXJndW1lbnRzEiEKCnByb2dyYW1faWQYASABKARCAjABUglwcm9ncmFtSWQSHAoGaG9sZGVyGAIgASgMQgSAtRgGUgZob2xkZXISFAoFY291bnQYAyABKA1SBWNvdW50EhIKBG1lbW8YBCABKAlSBG1lbW8iSwoNcmVkZWVtX3Jlc3VsdBIcCgd1bnNwZW50GAEgASgEQgIwAVIHdW5zcGVudBIcCgdyZXdhcmRzGAIgASgEQgIwAVIHcmV3YXJkcyJpChByZXZva2VfYXJndW1lbnRzEiEKCnByb2dyYW1faWQYASABKARCAjABUglwcm9ncmFtSWQSHAoGaG9sZGVyGAIgASgMQgSAtRgGUgZob2xkZXISFAoFY291bnQYAyABKA1SBWNvdW50Ii0KDXJldm9rZV9yZXN1bHQSHAoHdW5zcGVudBgBIAEoBEICMAFSB3Vuc3BlbnQiKQoLb3duZXJfZXZlbnQSGgoFb3duZXIYASABKAxCBIC1GAZSBW93bmVyIiwKDGlzc3Vlcl9ldmVudBIcCgZpc3N1ZXIYASABKAxCBIC1GAZSBmlzc3VlciJ/Cg1wcm9ncmFtX2V2ZW50EhIKAmlkGAEgASgEQgIwAVICaWQSGgoFb3duZXIYAiABKAxCBIC1GAZSBW93bmVyEhIKBG5hbWUYAyABKAlSBG5hbWUSEgoEa2luZBgEIAEoDVIEa2luZBIWCgZhY3RpdmUYBSABKAhSBmFjdGl2ZSKyAQoLc3RhbXBfZXZlbnQSIQoKcHJvZ3JhbV9pZBgBIAEoBEICMAFSCXByb2dyYW1JZBIcCgZob2xkZXIYAiABKAxCBIC1GAZSBmhvbGRlchIUCgVjb3VudBgDIAEoDVIFY291bnQSGgoGc3RhbXBzGAQgASgEQgIwAVIGc3RhbXBzEhwKB3Vuc3BlbnQYBSABKARCAjABUgd1bnNwZW50EhIKBG1lbW8YBiABKAlSBG1lbW8ilwEKDHJlZGVlbV9ldmVudBIhCgpwcm9ncmFtX2lkGAEgASgEQgIwAVIJcHJvZ3JhbUlkEhwKBmhvbGRlchgCIAEoDEIEgLUYBlIGaG9sZGVyEhQKBWNvdW50GAMgASgNUgVjb3VudBIcCgd1bnNwZW50GAQgASgEQgIwAVIHdW5zcGVudBISCgRtZW1vGAUgASgJUgRtZW1vIoMBCgxyZXZva2VfZXZlbnQSIQoKcHJvZ3JhbV9pZBgBIAEoBEICMAFSCXByb2dyYW1JZBIcCgZob2xkZXIYAiABKAxCBIC1GAZSBmhvbGRlchIUCgVjb3VudBgDIAEoDVIFY291bnQSHAoHdW5zcGVudBgEIAEoBEICMAFSB3Vuc3BlbnRiBnByb3RvMw=="
+}

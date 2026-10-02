@@ -1,0 +1,14 @@
+node_modules
+dist
+.keys.*.json
+contract/node_modules
+contract/.stubs
+contract/build/debug
+contract/assembly/proto/*.ts
+contract/assembly/index.ts
+contract/assembly/*.boilerplate.ts
+contract/*.pb
+contract/abi/*-abi.json
+*.tsbuildinfo
+rebuild*.json
+rebuild*.csv

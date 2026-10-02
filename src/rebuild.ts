@@ -51,6 +51,7 @@ export async function rebuildFromChain(opts: { network?: Network; contractId: st
   log(`${programs.length} programs on contract`);
 
   const events: RebuiltEvent[] = [];
+  const seen = new Set<string>();
   let seq: number | null = null;
   for (let page = 0; page < 10_000; page++) {
     const url = `${net.rest}/v1/account/${opts.contractId}/history?limit=100&ascending=true${seq != null ? `&seq_num=${seq}` : ""}`;
@@ -59,6 +60,9 @@ export async function rebuildFromChain(opts: { network?: Network; contractId: st
     if (!items.length) break;
     for (const it of items) {
       const tr = it.trx ?? {};
+      // The feed can list one transaction under several sequence numbers; keep each event once.
+      if (tr.transaction?.id && seen.has(tr.transaction.id)) continue;
+      if (tr.transaction?.id) seen.add(tr.transaction.id);
       for (const ev of tr.receipt?.events ?? []) {
         // Accept the current namespace and the pre-rename one, so older testnet history still rebuilds.
         const m = /^(koinky|stampa)\.(\w+)$/.exec(ev.name);

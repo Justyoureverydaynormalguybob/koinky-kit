@@ -1,5 +1,4 @@
 node_modules
-dist
 .keys.*.json
 contract/node_modules
 contract/.stubs

@@ -36,7 +36,6 @@
   ],
   "scripts": {
     "build": "node node_modules/typescript/bin/tsc -p tsconfig.json",
-    "prepare": "node node_modules/typescript/bin/tsc -p tsconfig.json",
     "test": "npm run build && node --test --experimental-strip-types tests/*.test.ts",
     "contract:build": "cd contract && sh scripts/build.sh release 0",
     "contract:test": "cd contract && sh scripts/test.sh"

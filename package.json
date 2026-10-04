@@ -1,6 +1,6 @@
 {
   "name": "koinky-kit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Issue soulbound records on the Koinos blockchain with one issuer key: programs, stamps, redemptions, batching, and rebuild-from-chain. Feeless for the holder, no wallet needed.",
   "license": "AGPL-3.0-only",
   "type": "module",

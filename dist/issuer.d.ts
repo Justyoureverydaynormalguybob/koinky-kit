@@ -135,8 +135,13 @@ export declare class Issuer {
      * Send a batch of record ops in one transaction. Resolves once the mempool
      * accepts it; call `waitFinal` or `txStatus` to track inclusion.
      * A rejected batch never applied, so it is safe to retry whole.
+     *
+     * `beforeBroadcast` runs once the transaction is signed and its id is fixed,
+     * before anything reaches the network. Record the id there: if the process
+     * dies after the broadcast, that id is how you learn whether the batch
+     * landed, instead of sending it a second time. If it throws, nothing is sent.
      */
-    sendBatch(ops: RecordOp[]): Promise<SendResult>;
+    sendBatch(ops: RecordOp[], beforeBroadcast?: (txId: string) => Promise<void>): Promise<SendResult>;
     /** One op, sent and waited for inclusion. Convenient; slower than batching. */
     send(op: RecordOp): Promise<SendResult>;
     stamp(programId: string | number, holder: string, count?: number, memo?: string): Promise<SendResult>;

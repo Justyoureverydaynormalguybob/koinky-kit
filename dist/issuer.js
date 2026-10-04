@@ -111,8 +111,13 @@ export class Issuer {
      * Send a batch of record ops in one transaction. Resolves once the mempool
      * accepts it; call `waitFinal` or `txStatus` to track inclusion.
      * A rejected batch never applied, so it is safe to retry whole.
+     *
+     * `beforeBroadcast` runs once the transaction is signed and its id is fixed,
+     * before anything reaches the network. Record the id there: if the process
+     * dies after the broadcast, that id is how you learn whether the batch
+     * landed, instead of sending it a second time. If it throws, nothing is sent.
      */
-    async sendBatch(ops) {
+    async sendBatch(ops, beforeBroadcast) {
         if (!ops.length)
             throw new Error("empty batch");
         if (ops.length > 50)
@@ -123,8 +128,13 @@ export class Issuer {
         const tx = new Transaction({ signer: this.signer, provider: this.provider, options: { rcLimit: await this.rcLimitFor(operations.length) } });
         for (const operation of operations)
             await tx.pushOperation(operation);
+        await tx.prepare();
+        await tx.sign();
+        const txId = tx.transaction.id;
+        if (beforeBroadcast)
+            await beforeBroadcast(txId);
         const receipt = await tx.send();
-        return { txId: tx.transaction.id, rcUsed: receipt?.rc_used ?? null, receipt };
+        return { txId, rcUsed: receipt?.rc_used ?? null, receipt };
     }
     /** One op, sent and waited for inclusion. Convenient; slower than batching. */
     async send(op) {
